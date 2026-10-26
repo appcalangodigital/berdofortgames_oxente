@@ -34,7 +34,7 @@ const THM=[{s:['#2f8fe8','#ffe2a8'],d:'#c68a4d',g:'#e8bf72',p:'#3b2614',h:'#e9b8
 {s:['#3a2a78','#ff9b55'],d:'#6b4a30',g:'#7cb342',p:'#24160c',h:'#5b3a7a',n:'Festa Junina'}];
 let W,H,t=40,u=1,NR=9,NC=80,m,seed=1,lv=1,lives=3,cu=0,sc='intro',st='x',T=0,P,en=[],co=[],it=[],pt=[],gx=0,sf=[],cam=0,K={l:0,r:0,j:0},paused=0,acc=0,lt=0,tm,ac,jb=0,cg=0,lk=0,wl=0,ft=0,bp=0,th=0,wx=-1,Z=THM[0];
 function rng(a){return()=>{a=a+0x6D2B79F5|0;let q=Math.imul(a^a>>>15,1|a);q=q+Math.imul(q^q>>>7,61|q)^q;return((q^q>>>14)>>>0)/4294967296}}
-function rs(){const d=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;X.setTransform(d,0,0,d,0,0);t=H/9;u=t/40;if(sc=='game')reset()}
+function rs(){const d=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;X.setTransform(d,0,0,d,0,0);t=H/9;u=t/40;if(sc=='game'&&st=='play')reset()}
 addEventListener('resize',rs);
 function sfx(n){try{ac=ac||new AudioContext();const o=ac.createOscillator(),g=ac.createGain(),f=[['square',300,650,.14],['square',800,1300,.09],['square',500,1000,.5],['sawtooth',250,90,.12],['sawtooth',420,100,.35],['square',300,1100,.45]][n],q=ac.currentTime;o.connect(g);g.connect(ac.destination);o.type=f[0];o.frequency.setValueAtTime(f[1],q);o.frequency.exponentialRampToValueAtTime(f[2],q+f[3]);g.gain.setValueAtTime(.06,q);g.gain.exponentialRampToValueAtTime(.001,q+f[3]+.05);o.start();o.stop(q+f[3]+.06)}catch(_){}}
 function toast(s){const e=$('tt');e.textContent=s;e.classList.remove('h');clearTimeout(tm);tm=setTimeout(()=>e.classList.add('h'),2400)}
@@ -44,8 +44,8 @@ function hud(){$('i1').textContent='FASE '+lv+'/10 · '+Z.n;$('i2').textContent=
 function menu(){sc='menu';st='x';th=0;Z=THM[0];cam=0;$('hud').classList.add('h');$('ctl').classList.add('h');$('tt').classList.add('h');show('<button class="g" data-a="play">▶ JOGAR</button>'+(matchMedia('(display-mode: standalone)').matches?'':'<button class="o" data-a="inst">📲 Instalar no celular</button>'),1)}
 function go1(){lv=Math.min(10,Math.max(1,mx));lives=3;cu=0;seed=Math.random()*1e9|0;sc='game';reset()}
 function reset(){K.l=K.r=K.j=0;paused=0;mx=Math.max(mx,lv);cs0=cu;savefase();build();hud();hide();$('hud').classList.remove('h');toast('Fase '+lv+' · '+Z.n+(lv==1?' — pegue as rapaduras 🍫, bata nos blocos ? por baixo, tem surpresa! E espere a sanfona cair do céu!':''))}
-var bmp={c:-1,r:-1,l:0},ls={x:0,fy:0},fl=[],mx=1,cs0=0;try{mx=Math.min(10,Math.max(1,+localStorage.getItem('fase')||1))}catch(e){}
-function savefase(){try{localStorage.setItem('fase',mx)}catch(e){}}
+var bmp={c:-1,r:-1,l:0},ls={x:0,fy:0},fl=[],mx=1,cs0=0;try{mx=Math.min(10,Math.max(1,+localStorage.getItem('berdo_fase')||1))}catch(e){}
+function savefase(){try{localStorage.setItem('berdo_fase',mx)}catch(e){}}
 function addcu(n){for(let i=0;i<n;i++){cu++;if(cu%30==0){lives++;toast('+1 vida! Arretado!')}}hud()}
 function bk(q){const r=q[1],cs=[Math.floor((P.x+P.w/2)/t),Math.floor(P.x/t),Math.floor((P.x+P.w-.01)/t)];
 for(const c of cs){const v=m[r*NC+c];if(v==3||v==5){m[r*NC+c]=4;bmp={c,r,l:10};const bx=(c+.5)*t;
@@ -108,7 +108,7 @@ function step(){
  cam=cl(P.x-W*.38,0,NC*t-W);
 }
 const A={play(){show('<h2>Escolha o modo</h2><button class="g" data-a="solo">👤 SOZINHO'+(mx>1?' <small>(fase '+mx+')</small>':'')+'</button>'+(mx>1?'<button data-a="novo">🆕 NOVO JOGO<br><small>(volta pra fase 1)</small></button>':'')+'<button data-a="duo">👥 MULTIPLAYER<br><small>(em breve)</small></button><button class="o" data-a="home">VOLTAR</button>')},
- home:menu,solo:go1,retry(){lives=3;cu=cs0;reset()},novo(){mx=1;savefase();go1()},duo(){toast('Multiplayer em breve!')},next(){lv++;reset()},resume(){paused=0;hide()}};
+ home:menu,solo:go1,retry(){lives=3;cu=cs0;reset()},novo(){if(!confirm('Apagar o progresso e voltar para a fase 1?'))return;mx=1;savefase();go1()},duo(){toast('Multiplayer em breve!')},next(){lv++;reset()},resume(){paused=0;hide()}};
 let dp;addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e});addEventListener('appinstalled',()=>toast('Instalado! Procure o ícone na tela inicial'));
 A.inst=()=>{if(dp){dp.prompt();dp=null}else if(/iphone|ipad|ipod/i.test(navigator.userAgent))show('<h2>Instalar no iPhone</h2><p>Toque em Compartilhar (quadradinho com seta) e depois em "Adicionar à Tela de Início".</p><button class="g" data-a="home">OK</button>');else toast('Abra o menu do navegador (⋮) e toque em "Instalar app" ou "Adicionar à tela inicial"')};
 if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
