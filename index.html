@@ -36,7 +36,7 @@ let W,H,t=40,u=1,NR=9,NC=80,m,seed=1,lv=1,lives=3,cu=0,sc='intro',st='x',T=0,P,e
 function rng(a){return()=>{a=a+0x6D2B79F5|0;let q=Math.imul(a^a>>>15,1|a);q=q+Math.imul(q^q>>>7,61|q)^q;return((q^q>>>14)>>>0)/4294967296}}
 function rs(){const d=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;X.setTransform(d,0,0,d,0,0);t=H/9;u=t/40;if(sc=='game'&&st=='play')reset()}
 addEventListener('resize',rs);
-function sfx(n){try{ac=ac||new AudioContext();const o=ac.createOscillator(),g=ac.createGain(),f=[['square',300,650,.14],['square',800,1300,.09],['square',500,1000,.5],['sawtooth',250,90,.12],['sawtooth',420,100,.35],['square',300,1100,.45]][n],q=ac.currentTime;o.connect(g);g.connect(ac.destination);o.type=f[0];o.frequency.setValueAtTime(f[1],q);o.frequency.exponentialRampToValueAtTime(f[2],q+f[3]);g.gain.setValueAtTime(.06,q);g.gain.exponentialRampToValueAtTime(.001,q+f[3]+.05);o.start();o.stop(q+f[3]+.06)}catch(_){}}
+function sfx(n){try{ac=ac||new AudioContext();const o=ac.createOscillator(),g=ac.createGain(),f=[['square',300,650,.14],['square',800,1300,.09],['square',500,1000,.5],['triangle',250,120,.12],['triangle',420,160,.3],['square',300,1100,.45]][n],q=ac.currentTime;o.connect(g);g.connect(ac.destination);o.type=f[0];o.frequency.setValueAtTime(f[1],q);o.frequency.exponentialRampToValueAtTime(f[2],q+f[3]);g.gain.setValueAtTime(.06,q);g.gain.exponentialRampToValueAtTime(.001,q+f[3]+.05);o.start();o.stop(q+f[3]+.06)}catch(_){}}
 function toast(s){const e=$('tt');e.textContent=s;e.classList.remove('h');clearTimeout(tm);tm=setTimeout(()=>e.classList.add('h'),2400)}
 function show(h,bt){K.l=K.r=K.j=0;ov.innerHTML='<div class="p'+(bt?' bt':'')+'">'+h+'</div>';ov.classList.remove('h');$('ctl').classList.add('h')}
 function hide(){ov.classList.add('h');if(sc=='game')$('ctl').classList.remove('h')}
@@ -70,14 +70,14 @@ function build(){
  P={x:t*1.5,y:7*t-1.1*t,vx:0,vy:0,w:.6*t,h:1.1*t,big:0,f:1,ph:0,on:1,inv:0};ls={x:P.x,fy:P.y+P.h};st='play';cam=0;
 }
 function bst(x,y,c,n){for(let i=0;i<n;i++)pt.push({x,y,vx:(Math.random()-.5)*6,vy:-Math.random()*5,l:40,c,s:5})}
-function die(){if(st!='play')return;st='dead';ft=80;P.vy=-9*u;P.big=0;sfx(4);toast('Eita! Perdeu uma vida')}
-function respawn(){P.w=.6*t;P.h=1.1*t;P.x=ls.x;P.y=ls.fy-P.h;P.vx=P.vy=0;P.big=0;P.on=1;P.inv=150;P.ph=0;K.l=K.r=K.j=0;st='play';toast('Bora de novo! Você continua de onde parou')}
-function hurt(){if(P.inv>0||st!='play')return;if(P.big){P.big=0;P.y+=.5*t;P.h=1.1*t;P.w=.6*t;P.inv=110;P.vy=-6*u;sfx(4);toast('Oxente! Perdeu a sanfona')}else die()}
+function die(){if(st!='play')return;st='dead';ft=80;P.vy=-9*u;P.big=0;sfx(4);toast('Ops! Bora tentar de novo 😄')}
+function respawn(){P.w=.6*t;P.h=1.1*t;P.x=ls.x;P.y=ls.fy-P.h;P.vx=P.vy=0;P.big=0;P.on=1;P.inv=150;P.ph=0;K.l=K.r=K.j=0;st='play';toast('Bora de novo! Você consegue! 💪')}
+function hurt(){if(P.inv>0||st!='play')return;if(P.big){P.big=0;P.y+=.5*t;P.h=1.1*t;P.w=.6*t;P.inv=110;P.vy=-6*u;sfx(4);toast('Ops! A sanfona fugiu, pega outra! 🪗')}else die()}
 function win(){st='win';sfx(2);bst(P.x,P.y,'#ffd34f',40);const end=lv>=10;mx=end?1:Math.max(mx,lv+1);savefase();
- show('<div class="e">🏆</div><h2>'+(end?'Arretado! Você zerou!':'Fase concluída!')+'</h2><p>🍫 '+cu+' rapaduras · ❤ '+lives+'</p>'+(end?'':'<button class="g" data-a="next">PRÓXIMA FASE ▶</button>')+'<button class="o" data-a="home">MENU INICIAL</button>')}
+ show('<div class="e">🏆</div><h2>'+(end?'Arretado! Você zerou! 🎉':'Mandou bem demais! 🎉')+'</h2><p>🍫 '+cu+' rapaduras · ❤ '+lives+'</p>'+(end?'':'<button class="g" data-a="next">PRÓXIMA FASE ▶</button>')+'<button class="o" data-a="home">MENU INICIAL</button>')}
 function step(){
  pt.forEach(q=>{q.x+=q.vx;q.y+=q.vy;q.vy+=.25;q.l--});pt=pt.filter(q=>q.l>0);if(bmp.l>0)bmp.l--;fl.forEach(o=>{o.y+=o.vy;o.vy+=.5*u;o.l--});fl=fl.filter(o=>o.l>0);
- if(st=='dead'){P.vy+=.5*u;P.y+=P.vy;if(--ft<=0){lives--;hud();if(lives<=0){st='over';show('<div class="e">😢</div><h2>Fim de jogo</h2><p>Você pegou '+cu+' rapaduras. Bora tentar a fase '+lv+' de novo!</p><button class="g" data-a="retry">TENTAR DE NOVO</button><button class="o" data-a="home">MENU INICIAL</button>')}else respawn()}return}
+ if(st=='dead'){P.vy+=.5*u;P.y+=P.vy;if(--ft<=0){lives--;hud();if(lives<=0){lives=3;hud();respawn();toast('Eita, que emoção! Ganhou 3 vidas, bora! 🎉');return}if(0){st='over';show('<div class="e">😢</div><h2>Fim de jogo</h2><p>Você pegou '+cu+' rapaduras. Bora tentar a fase '+lv+' de novo!</p><button class="g" data-a="retry">TENTAR DE NOVO</button><button class="o" data-a="home">MENU INICIAL</button>')}else respawn()}return}
  if(st!='play')return;
  const g=.55*u,d=K.r-K.l;
  if(P.on)cg=6;else if(cg>0)cg--;if(jb>0)jb--;
